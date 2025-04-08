@@ -1,10 +1,30 @@
 # Agencia-de-eventos
+# 🎉 Agencia de Eventos - ERP
 
-Agencia de Eventos (Bodas, Fiestas, etc.)
-Función del ERP:
+Este es un sistema ERP (Enterprise Resource Planning) desarrollado para gestionar todos los aspectos de una agencia de eventos, incluyendo la planificación, inventario, facturación, contabilidad y comunicación con los clientes.
 
-Gestión de Clientes y Proyectos: Organiza cada evento como un proyecto independiente, con fechas, proveedores y detalles personalizados.
-Control de Inventarios: Gestiona los artículos de alquiler (mesas, sillas, decoraciones) y los recursos disponibles.
-Facturación: Genera facturas según los servicios contratados, con posibilidad de pagos parciales o completos.
-Integración web: Los clientes pueden ver opciones de paquetes de servicios, elegir proveedores y hacer pagos directamente desde la página.
-Beneficios: Facilita la coordinación de eventos, asegurando que todo se entregue a tiempo y dentro del presupuesto.
+## 🧑‍💻 Equipo de Desarrollo
+
+- José (@imJOS3)
+- [Nombre Dev 2]
+- [Nombre Dev 3]
+- [Nombre Dev 4]
+
+## 🧩 Módulos Principales
+
+- 🎯 **Gestión de Clientes y Proyectos:** Registro de clientes, contratos, planificación de eventos.
+- 📦 **Control de Inventario:** Alquiler y control de artículos, recursos y disponibilidad.
+- 💵 **Facturación y Pagos:** Generación de facturas, pagos parciales o completos.
+- 📊 **Contabilidad:** Registro de transacciones, flujo de caja, reportes financieros.
+- 🌐 **Portal del Cliente:** Interfaz web donde los clientes pueden ver y contratar servicios.
+
+## 🛠️ Tecnologías
+
+- Backend: Java 21 + Spring Boot + Spring Cloud
+- Frontend: React / Vite / TailwindCSS
+- Base de Datos: PostgreSQL / MongoDB
+- Contenedores: Docker + Docker Compose
+- Control de versiones: Git + GitHub
+
+## 📦 Estructura del Repositorio
+
