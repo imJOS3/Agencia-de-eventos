@@ -1,5 +1,5 @@
 # Agencia-de-eventos
-# # Agencia de Eventos - ERP
+## Agencia de Eventos - ERP
 
 Este es un sistema ERP (Enterprise Resource Planning) desarrollado para gestionar todos los aspectos de una agencia de eventos, incluyendo la planificación, inventario, facturación, contabilidad y comunicación con los clientes.
 
