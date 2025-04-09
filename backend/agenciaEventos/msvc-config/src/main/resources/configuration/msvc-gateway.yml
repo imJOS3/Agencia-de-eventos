@@ -1,0 +1,45 @@
+server:
+  port: 8090
+
+spring:
+  application:
+    name: msvc-gateway
+
+  cloud:
+    gateway:
+      routes:
+        - id: msvc-auth
+          uri: lb://msvc-auth
+          predicates:
+            - Path=/api/auth/**
+        - id: msvc-clientes
+          uri: lb://msvc-clientes
+          predicates:
+            - Path=/api/clientes/**
+        - id: msvc-inventario
+          uri: lb://msvc-inventario
+          predicates:
+            - Path=/api/inventario/**
+        - id: msvc-eventos
+          uri: lb://msvc-eventos
+          predicates:
+            - Path=/api/eventos/**
+        - id: msvc-proveedores
+          uri: lb://msvc-proveedores
+          predicates:
+            - Path=/api/proveedores/**
+        - id: msvc-facturacion
+          uri: lb://msvc-facturacion
+          predicates:
+            - Path=/api/facturacion/**
+        - id: msvc-pagos
+          uri: lb://msvc-pagos
+          predicates:
+            - Path=/api/pagos/**
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka
