@@ -1,0 +1,183 @@
+version: '3.8'
+
+services:
+  # Config Server
+  msvc-config:
+    build: ./msvc-config
+    container_name: msvc-config
+    ports:
+      - "8888:8888"
+
+  # Eureka Server
+  msvc-eureka:
+    build: ./msvc-eureka
+    container_name: msvc-eureka
+    depends_on:
+      - msvc-config
+    environment:
+      SPRING_CONFIG_IMPORT: optional:configserver:http://msvc-config:8888
+    ports:
+      - "8761:8761"
+
+  # GATEWAY
+  msvc-gateway:
+    build: ./msvc-gateway
+    container_name: msvc-gateway
+    depends_on:
+      - msvc-config
+      - msvc-eureka
+    environment:
+      SPRING_CONFIG_IMPORT: optional:configserver:http://msvc-config:8888
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://msvc-eureka:8761/eureka
+    ports:
+      - "8085:8085"
+
+  # Microservicios con base de datos
+  mysql-auth:
+    image: mysql:8
+    container_name: mysql-auth
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: authdb
+      MYSQL_USER: user
+      MYSQL_PASSWORD: secret
+    ports:
+      - "3308:3306"
+    volumes:
+      - mysql_auth_data:/var/lib/mysql
+
+  msvc-auth:
+    build: ./msvc-auth
+    container_name: msvc-auth
+    depends_on:
+      - mysql-auth
+      - msvc-config
+      - msvc-eureka
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-auth:3306/authdb
+      SPRING_DATASOURCE_USERNAME: user
+      SPRING_DATASOURCE_PASSWORD: secret
+      SPRING_CONFIG_IMPORT: optional:configserver:http://msvc-config:8888
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://msvc-eureka:8761/eureka
+    ports:
+      - "8080:8080"
+
+  mysql-clientes:
+    image: mysql:8
+    container_name: mysql-clientes
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: clientesdb
+      MYSQL_USER: user
+      MYSQL_PASSWORD: secret
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_clientes_data:/var/lib/mysql
+
+  msvc-clientes:
+    build: ./msvc-clientes
+    container_name: msvc-clientes
+    depends_on:
+      - mysql-clientes
+      - msvc-config
+      - msvc-eureka
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-clientes:3306/clientesdb
+      SPRING_DATASOURCE_USERNAME: user
+      SPRING_DATASOURCE_PASSWORD: secret
+      SPRING_CONFIG_IMPORT: optional:configserver:http://msvc-config:8888
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://msvc-eureka:8761/eureka
+    ports:
+      - "8081:8081"
+
+  mysql-inventario:
+    image: mysql:8
+    container_name: mysql-inventario
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: inventariodb
+      MYSQL_USER: user
+      MYSQL_PASSWORD: secret
+    volumes:
+      - mysql_inventario_data:/var/lib/mysql
+
+  msvc-inventario:
+    build: ./msvc-inventario
+    container_name: msvc-inventario
+    depends_on:
+      - mysql-inventario
+      - msvc-config
+      - msvc-eureka
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-inventario:3306/inventariodb
+      SPRING_DATASOURCE_USERNAME: user
+      SPRING_DATASOURCE_PASSWORD: secret
+      SPRING_CONFIG_IMPORT: optional:configserver:http://msvc-config:8888
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://msvc-eureka:8761/eureka
+    ports:
+      - "8082:8082"
+
+  msvc-eventos:
+    build: ./msvc-eventos
+    container_name: msvc-eventos
+    depends_on:
+      - msvc-config
+      - msvc-eureka
+    environment:
+      SPRING_CONFIG_IMPORT: optional:configserver:http://msvc-config:8888
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://msvc-eureka:8761/eureka
+    ports:
+      - "8083:8083"
+
+  msvc-proveedores:
+    build: ./msvc-proveedores
+    container_name: msvc-proveedores
+    depends_on:
+      - msvc-config
+      - msvc-eureka
+    environment:
+      SPRING_CONFIG_IMPORT: optional:configserver:http://msvc-config:8888
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://msvc-eureka:8761/eureka
+    ports:
+      - "8084:8084"
+
+  msvc-facturacion:
+    build: ./msvc-facturacion
+    container_name: msvc-facturacion
+    depends_on:
+      - msvc-config
+      - msvc-eureka
+    environment:
+      SPRING_CONFIG_IMPORT: optional:configserver:http://msvc-config:8888
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://msvc-eureka:8761/eureka
+    ports:
+      - "8086:8086"
+
+  msvc-pagos:
+    build: ./msvc-pagos
+    container_name: msvc-pagos
+    depends_on:
+      - msvc-config
+      - msvc-eureka
+    environment:
+      SPRING_CONFIG_IMPORT: optional:configserver:http://msvc-config:8888
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://msvc-eureka:8761/eureka
+    ports:
+      - "8087:8087"
+
+  # Cliente web (puede ser React, Angular, etc.)
+  msvc-clienteweb:
+    build: ./msvc-clienteweb
+    container_name: msvc-clienteweb
+    depends_on:
+      - msvc-config
+      - msvc-eureka
+      - msvc-gateway
+    ports:
+      - "3000:3000"
+
+volumes:
+  mysql_auth_data:
+  mysql_clientes_data:
+  mysql_inventario_data:
