@@ -30,6 +30,9 @@ export default function Proveedores() {
 
   return (
     <Layout>
+
+      <div className="p-5">
+
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Proveedores</h1>
         <button
@@ -127,6 +130,8 @@ export default function Proveedores() {
           </div>
         </div>
       )}
+      </div>
+
     </Layout>
   );
 }

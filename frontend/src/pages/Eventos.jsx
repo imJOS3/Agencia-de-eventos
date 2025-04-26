@@ -30,7 +30,10 @@ export default function Eventos() {
 
   return (
     <Layout>
-      <div className="flex justify-between items-center mb-6">
+
+      <div className="p-5">
+
+      <div className="flex justify-between items-center mb-6 " >  
         <h1 className="text-3xl font-bold">Eventos</h1>
         <button
           onClick={() => setShowModal(true)}
@@ -42,7 +45,7 @@ export default function Eventos() {
 
       <div className="overflow-x-auto bg-white rounded-xl shadow-md">
         <table className="min-w-full text-sm text-left">
-          <thead className="bg-gray-100 text-gray-600 uppercase text-xs">
+          <thead className="bg-blue-200 text-gray-600 uppercase text-xs">
             <tr>
               <th className="px-6 py-4">Nombre</th>
               <th className="px-6 py-4">Fecha</th>
@@ -131,7 +134,9 @@ export default function Eventos() {
             </form>
           </div>
         </div>
+      
       )}
+      </div>
     </Layout>
   );
 }

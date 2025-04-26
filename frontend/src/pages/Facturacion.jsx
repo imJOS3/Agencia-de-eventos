@@ -30,6 +30,10 @@ export default function Facturacion() {
 
   return (
     <Layout>
+
+      <div className="p-5">
+
+
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Facturación</h1>
         <button
@@ -134,6 +138,8 @@ export default function Facturacion() {
           </div>
         </div>
       )}
+      </div>
+
     </Layout>
   );
 }

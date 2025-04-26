@@ -9,6 +9,8 @@ import Proveedores from "./pages/Proveedores";
 import Facturacion from "./pages/Facturacion";
 import Pagos from "./pages/Pagos";
 import Eventos from "./pages/Eventos";
+import Home from "./pages/Home";
+import NotFound from "./pages/NotFound";
 
 export default function AppRoutes() {
   return (
@@ -42,9 +44,11 @@ export default function AppRoutes() {
         
         {/* Página de Pagos */}
         <Route path="/pagos" element={<Pagos />} />
+
+        <Route path="*" element={<NotFound />} />
         
-        {/* Redirigir a Dashboard si el usuario está logueado */}
-        <Route path="/" element={<Dashboard />} />
+        <Route path="/" element={<Home />} />
+ 
       </Routes>
 
   );

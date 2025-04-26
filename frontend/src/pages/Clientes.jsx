@@ -25,6 +25,7 @@ export default function Clientes() {
 
   return (
     <Layout>
+      <div className="p-5">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Clientes</h1>
         <button
@@ -118,6 +119,7 @@ export default function Clientes() {
           </div>
         </div>
       )}
+       </div>
     </Layout>
   );
 }
