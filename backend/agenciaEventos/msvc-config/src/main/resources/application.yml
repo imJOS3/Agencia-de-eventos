@@ -1,5 +1,5 @@
 server:
-    port: 8888
+  port: 8888
 
 spring:
   application:
@@ -11,6 +11,8 @@ spring:
       server:
         native:
           search-locations: classpath:/configuration/
+
 eureka:
   client:
-    register-with-eureka: false
+    service-url:
+      defaultZone: http://eureka-server:8761/eureka/
