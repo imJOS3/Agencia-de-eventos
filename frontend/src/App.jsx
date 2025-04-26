@@ -47,7 +47,7 @@ export default function AppRoutes() {
 
         <Route path="*" element={<NotFound />} />
         
-        <Route path="/" element={<Home />} />
+        <Route path="/" element={<Login />} />
  
       </Routes>
 
