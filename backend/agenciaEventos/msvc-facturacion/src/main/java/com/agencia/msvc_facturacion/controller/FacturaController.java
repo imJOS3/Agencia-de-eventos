@@ -41,8 +41,8 @@ public class FacturaController {
             f.setFechaEmision(factura.getFechaEmision());
             f.setTotal(factura.getTotal());
             f.setEstado(factura.getEstado());
-            f.setEvento(factura.getEvento());
-            f.setCliente(factura.getCliente());
+            f.setEventoId(factura.getEventoId());
+            f.setClienteId(factura.getClienteId());
             return ResponseEntity.ok(service.guardar(f));
         }).orElse(ResponseEntity.notFound().build());
     }

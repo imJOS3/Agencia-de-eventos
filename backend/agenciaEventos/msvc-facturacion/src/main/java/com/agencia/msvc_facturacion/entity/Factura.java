@@ -9,6 +9,7 @@ import java.util.Date;
 @Entity
 @Getter
 @Setter
+@Table(name = "facturas")
 public class Factura {
 
     @Id
@@ -17,15 +18,15 @@ public class Factura {
 
     private String numeroFactura;
 
+    @Temporal(TemporalType.DATE)
     private Date fechaEmision;
 
     private double total;
 
     private String estado; // Pendiente, pagada, cancelada
 
-    @ManyToOne
-    private Evento evento;
+    // Referencias a otros microservicios usando solo IDs
+    private Long eventoId;
 
-    @ManyToOne
-    private Cliente cliente;
+    private Long clienteId;
 }
