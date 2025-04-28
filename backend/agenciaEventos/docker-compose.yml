@@ -1,6 +1,7 @@
 version: '3.8'
 
 services:
+
   config:
     build:
       context: ./msvc-config
@@ -38,7 +39,6 @@ services:
       timeout: 5s
     networks:
       - erp-net
-
 
   mysql:
     image: mysql:8.0
@@ -82,6 +82,143 @@ services:
     networks:
       - erp-net
 
+  msvc-eventos:
+    build:
+      context: ./msvc-eventos
+    container_name: msvc-eventos
+    hostname: msvc-eventos
+    ports:
+      - "8004:8004"
+    depends_on:
+      config:
+        condition: service_healthy
+      eureka:
+        condition: service_healthy
+      mysql:
+        condition: service_healthy
+    environment:
+      - SPRING_PROFILES_ACTIVE=default
+      - SPRING_CONFIG_IMPORT=optional:configserver:http://config-server:8888
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/agencia_eventos_db
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=tu_contraseña
+    networks:
+      - erp-net
+
+  msvc-auth:
+    build:
+      context: ./msvc-auth
+    container_name: msvc-auth
+    hostname: msvc-auth
+    ports:
+      - "8001:8001"
+    depends_on:
+      config:
+        condition: service_healthy
+      eureka:
+        condition: service_healthy
+      mysql:
+        condition: service_healthy
+    environment:
+      - SPRING_PROFILES_ACTIVE=default
+      - SPRING_CONFIG_IMPORT=optional:configserver:http://config-server:8888
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/agencia_eventos_db
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=tu_contraseña
+    networks:
+      - erp-net
+
+  msvc-facturacion:
+    build:
+      context: ./msvc-facturacion
+    container_name: msvc-facturacion
+    hostname: msvc-facturacion
+    ports:
+      - "8006:8006"
+    depends_on:
+      config:
+        condition: service_healthy
+      eureka:
+        condition: service_healthy
+      mysql:
+        condition: service_healthy
+    environment:
+      - SPRING_PROFILES_ACTIVE=default
+      - SPRING_CONFIG_IMPORT=optional:configserver:http://config-server:8888
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/agencia_eventos_db
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=tu_contraseña
+    networks:
+      - erp-net
+
+  msvc-inventario:
+    build:
+      context: ./msvc-inventario
+    container_name: msvc-inventario
+    hostname: msvc-inventario
+    ports:
+      - "8003:8003"
+    depends_on:
+      config:
+        condition: service_healthy
+      eureka:
+        condition: service_healthy
+      mysql:
+        condition: service_healthy
+    environment:
+      - SPRING_PROFILES_ACTIVE=default
+      - SPRING_CONFIG_IMPORT=optional:configserver:http://config-server:8888
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/agencia_eventos_db
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=tu_contraseña
+    networks:
+      - erp-net
+
+  msvc-pagos:
+    build:
+      context: ./msvc-pagos
+    container_name: msvc-pagos
+    hostname: msvc-pagos
+    ports:
+      - "8007:8007"
+    depends_on:
+      config:
+        condition: service_healthy
+      eureka:
+        condition: service_healthy
+      mysql:
+        condition: service_healthy
+    environment:
+      - SPRING_PROFILES_ACTIVE=default
+      - SPRING_CONFIG_IMPORT=optional:configserver:http://config-server:8888
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/agencia_eventos_db
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=tu_contraseña
+    networks:
+      - erp-net
+
+  msvc-proveedores:
+    build:
+      context: ./msvc-proveedores
+    container_name: msvc-proveedores
+    hostname: msvc-proveedores
+    ports:
+      - "8005:8005"
+    depends_on:
+      config:
+        condition: service_healthy
+      eureka:
+        condition: service_healthy
+      mysql:
+        condition: service_healthy
+    environment:
+      - SPRING_PROFILES_ACTIVE=default
+      - SPRING_CONFIG_IMPORT=optional:configserver:http://config-server:8888
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/agencia_eventos_db
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=tu_contraseña
+    networks:
+      - erp-net
 
 networks:
   erp-net:
