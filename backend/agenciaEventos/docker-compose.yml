@@ -220,6 +220,24 @@ services:
     networks:
       - erp-net
 
+  msvc-gateway:
+    build:
+      context: ./msvc-gateway
+    container_name: msvc-gateway
+    hostname: msvc-gateway
+    ports:
+      - "8090:8090"
+    depends_on:
+      config:
+        condition: service_healthy
+      eureka:
+        condition: service_healthy
+    environment:
+      - SPRING_PROFILES_ACTIVE=default
+      - SPRING_CONFIG_IMPORT=optional:configserver:http://config-server
+    networks:
+      - erp-net
+
 networks:
   erp-net:
     driver: bridge
