@@ -1,9 +1,10 @@
 server:
-  port: 8008
+  port: 8080
 
 spring:
   application:
     name: msvc-clienteweb
+
 
 eureka:
   client:
