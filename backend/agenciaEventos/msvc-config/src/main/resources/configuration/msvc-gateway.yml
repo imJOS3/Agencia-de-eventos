@@ -8,10 +8,16 @@ spring:
   cloud:
     gateway:
       routes:
-        - id: msvc-auth
+        - id: msvc-auth-auth
           uri: lb://msvc-auth
           predicates:
-            - Path=/api/auth/**
+            - Path=/auth/**
+
+        - id: msvc-auth-usuarios
+          uri: lb://msvc-auth
+          predicates:
+            - Path=/api/usuarios/**
+
         - id: msvc-clientes
           uri: lb://msvc-clientes
           predicates:
@@ -43,3 +49,4 @@ eureka:
     fetch-registry: true
     service-url:
       defaultZone: http://eureka-server:8761/eureka/
+
