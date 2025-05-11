@@ -17,4 +17,11 @@ const authenticateToken = (req, res, next) => {
   });
 };
 
+module.exports = (req, res, next) => {
+  if (!req.session.token) {
+    return res.status(401).json({ message: 'No autorizado: token faltante' });
+  }
+  next();
+};
+
 module.exports = authenticateToken;

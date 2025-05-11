@@ -3,7 +3,7 @@ const apiClient = require('../utils/apiClient');
 // Obtener todos los clientes
 const getClientes = async (req, res) => {
   try {
-    const response = await apiClient.get('/clientes');
+    const response = await apiClient.get('/api/clientes');
     res.json(response.data);
   } catch (error) {
     console.error('❌ Error al obtener clientes:', error.message);
@@ -15,7 +15,7 @@ const getClientes = async (req, res) => {
 const getClienteById = async (req, res) => {
   const { id } = req.params;
   try {
-    const response = await apiClient.get(`/clientes/${id}`);
+    const response = await apiClient.get(`/api/clientes/${id}`);
     res.json(response.data);
   } catch (error) {
     console.error(`❌ Error al obtener cliente con ID ${id}:`, error.message);
@@ -26,7 +26,7 @@ const getClienteById = async (req, res) => {
 // Crear un nuevo cliente
 const createCliente = async (req, res) => {
   try {
-    const response = await apiClient.post('/clientes', req.body);
+    const response = await apiClient.post('/api/clientes', req.body);
     res.status(201).json(response.data);
   } catch (error) {
     console.error('❌ Error al crear cliente:', error.message);
@@ -50,7 +50,7 @@ const updateCliente = async (req, res) => {
 const deleteCliente = async (req, res) => {
   const { id } = req.params;
   try {
-    await apiClient.delete(`/clientes/${id}`);
+    await apiClient.delete(`/api/clientes/${id}`);
     res.json({ message: 'Cliente eliminado correctamente' });
   } catch (error) {
     console.error(`❌ Error al eliminar cliente con ID ${id}:`, error.message);

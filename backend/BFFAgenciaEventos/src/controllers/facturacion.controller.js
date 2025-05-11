@@ -1,4 +1,4 @@
-const apiClient = require('../config/apiClient');
+const apiClient = require('../utils/apiClient');
 
 // Obtener todas las facturas
 const getFacturas = async (req, res) => {
