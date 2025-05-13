@@ -1,9 +1,10 @@
-const apiClient = require('../utils/apiClient');
+const createApiClient = require('../utils/apiClient');
 
 // Obtener todos los eventos
 const getEventos = async (req, res) => {
   try {
-    const response = await apiClient.get('/eventos');
+    const apiClient = createApiClient(req.session.token);
+    const response = await apiClient.get('/api/eventos');
     res.json(response.data);
   } catch (error) {
     console.error('Error al obtener eventos:', error.message);
@@ -15,7 +16,8 @@ const getEventos = async (req, res) => {
 const getEventoById = async (req, res) => {
   const { id } = req.params;
   try {
-    const response = await apiClient.get(`/eventos/${id}`);
+    const apiClient = createApiClient(req.session.token);
+    const response = await apiClient.get(`/api/eventos/${id}`);
     res.json(response.data);
   } catch (error) {
     console.error(`❌ Error al obtener evento con ID ${id}:`, error.message);
@@ -26,7 +28,8 @@ const getEventoById = async (req, res) => {
 // Crear un nuevo evento
 const createEvento = async (req, res) => {
   try {
-    const response = await apiClient.post('/eventos', req.body);
+    const apiClient = createApiClient(req.session.token);
+    const response = await apiClient.post('/api/eventos', req.body);
     res.status(201).json(response.data);
   } catch (error) {
     console.error('❌ Error al crear evento:', error.message);
@@ -38,7 +41,8 @@ const createEvento = async (req, res) => {
 const updateEvento = async (req, res) => {
   const { id } = req.params;
   try {
-    const response = await apiClient.put(`/eventos/${id}`, req.body);
+    const apiClient = createApiClient(req.session.token);
+    const response = await apiClient.put(`/api/eventos/${id}`, req.body);
     res.json(response.data);
   } catch (error) {
     console.error(`❌ Error al actualizar evento con ID ${id}:`, error.message);
@@ -50,7 +54,8 @@ const updateEvento = async (req, res) => {
 const deleteEvento = async (req, res) => {
   const { id } = req.params;
   try {
-    await apiClient.delete(`/eventos/${id}`);
+    const apiClient = createApiClient(req.session.token);
+    await apiClient.delete(`/api/eventos/${id}`);
     res.json({ message: 'Evento eliminado correctamente' });
   } catch (error) {
     console.error(`❌ Error al eliminar evento con ID ${id}:`, error.message);

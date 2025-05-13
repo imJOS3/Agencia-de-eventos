@@ -1,9 +1,10 @@
-const apiClient = require('../utils/apiClient');
+const createApiClient = require('../utils/apiClient');
 
 // Obtener todos los usuarios
 const getUsers = async (req, res) => {
   try {
-    const response = await apiClient.get('/users');
+    const apiClient = createApiClient(req.session.token);
+    const response = await apiClient.get('/api/usuarios');
     res.json(response.data);
   } catch (error) {
     console.error('Error al obtener usuarios:', error.message);
@@ -15,7 +16,8 @@ const getUsers = async (req, res) => {
 const getUserById = async (req, res) => {
   const { id } = req.params;
   try {
-    const response = await apiClient.get(`/users/${id}`);
+    const apiClient = createApiClient(req.session.token);
+    const response = await apiClient.get(`/api/usuarios/${id}`);
     res.json(response.data);
   } catch (error) {
     console.error(`❌ Error al obtener usuario con ID ${id}:`, error.message);
@@ -26,7 +28,8 @@ const getUserById = async (req, res) => {
 // Crear un nuevo usuario
 const createUser = async (req, res) => {
   try {
-    const response = await apiClient.post('/users', req.body);
+    const apiClient = createApiClient(req.session.token);
+    const response = await apiClient.post('/api/usuarios', req.body);
     res.status(201).json(response.data);
   } catch (error) {
     console.error('❌ Error al crear usuario:', error.message);
@@ -38,7 +41,8 @@ const createUser = async (req, res) => {
 const updateUser = async (req, res) => {
   const { id } = req.params;
   try {
-    const response = await apiClient.put(`/users/${id}`, req.body);
+    const apiClient = createApiClient(req.session.token);
+    const response = await apiClient.put(`/api/usuarios/${id}`, req.body);
     res.json(response.data);
   } catch (error) {
     console.error(`❌ Error al actualizar usuario con ID ${id}:`, error.message);
@@ -50,7 +54,8 @@ const updateUser = async (req, res) => {
 const deleteUser = async (req, res) => {
   const { id } = req.params;
   try {
-    await apiClient.delete(`/users/${id}`);
+    const apiClient = createApiClient(req.session.token);
+    await apiClient.delete(`/api/usuarios/${id}`);
     res.json({ message: 'Usuario eliminado correctamente' });
   } catch (error) {
     console.error(`❌ Error al eliminar usuario con ID ${id}:`, error.message);

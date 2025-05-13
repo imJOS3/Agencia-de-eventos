@@ -1,9 +1,10 @@
-const apiClient = require('../utils/apiClient');
+const createApiClient = require('../utils/apiClient');
 
 // Obtener todos los productos de inventario
 const getInventario = async (req, res) => {
   try {
-    const response = await apiClient.get('/inventario');
+    const apiClient = createApiClient(req.session.token);
+    const response = await apiClient.get('/api/inventario');
     res.json(response.data);
   } catch (error) {
     console.error('❌ Error al obtener inventario:', error.message);
@@ -15,7 +16,8 @@ const getInventario = async (req, res) => {
 const getProductoById = async (req, res) => {
   const { id } = req.params;
   try {
-    const response = await apiClient.get(`/inventario/${id}`);
+    const apiClient = createApiClient(req.session.token);
+    const response = await apiClient.get(`/api/inventario/${id}`);
     res.json(response.data);
   } catch (error) {
     console.error(`❌ Error al obtener producto con ID ${id}:`, error.message);
@@ -26,7 +28,8 @@ const getProductoById = async (req, res) => {
 // Crear un nuevo producto en inventario
 const createProducto = async (req, res) => {
   try {
-    const response = await apiClient.post('/inventario', req.body);
+    const apiClient = createApiClient(req.session.token);
+    const response = await apiClient.post('/api/inventario', req.body);
     res.status(201).json(response.data);
   } catch (error) {
     console.error('❌ Error al crear producto:', error.message);
@@ -38,7 +41,8 @@ const createProducto = async (req, res) => {
 const updateProducto = async (req, res) => {
   const { id } = req.params;
   try {
-    const response = await apiClient.put(`/inventario/${id}`, req.body);
+    const apiClient = createApiClient(req.session.token);
+    const response = await apiClient.put(`/api/inventario/${id}`, req.body);
     res.json(response.data);
   } catch (error) {
     console.error(`❌ Error al actualizar producto con ID ${id}:`, error.message);
@@ -50,7 +54,8 @@ const updateProducto = async (req, res) => {
 const deleteProducto = async (req, res) => {
   const { id } = req.params;
   try {
-    await apiClient.delete(`/inventario/${id}`);
+    const apiClient = createApiClient(req.session.token);
+    await apiClient.delete(`/api/inventario/${id}`);
     res.json({ message: 'Producto eliminado correctamente' });
   } catch (error) {
     console.error(`❌ Error al eliminar producto con ID ${id}:`, error.message);

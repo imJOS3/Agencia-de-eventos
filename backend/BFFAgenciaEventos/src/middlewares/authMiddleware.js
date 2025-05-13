@@ -1,27 +1,21 @@
 const jwt = require('jsonwebtoken');
 
-const authenticateToken = (req, res, next) => {
-  const token = req.header('Authorization') && req.header('Authorization').split(' ')[1];
+const authMiddleware = (req, res, next) => {
+  const authHeader = req.headers.authorization;
 
-  if (!token) {
-    return res.status(401).json({ message: 'Acceso no autorizado, token faltante' });
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ message: 'Token no proporcionado' });
   }
 
-  jwt.verify(token, process.env.JWT_SECRET_KEY, (err, user) => {
-    if (err) {
-      return res.status(403).json({ message: 'Token inválido' });
-    }
+  const token = authHeader.split(' ')[1];
 
-    req.user = user;  // El usuario autenticado estará disponible en `req.user`
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET); // Usa la misma clave con la que firmaste el token
+    req.user = decoded; // Por si necesitas acceder a los datos del usuario
     next();
-  });
-};
-
-module.exports = (req, res, next) => {
-  if (!req.session.token) {
-    return res.status(401).json({ message: 'No autorizado: token faltante' });
+  } catch (err) {
+    return res.status(401).json({ message: 'Token inválido o expirado' });
   }
-  next();
 };
 
-module.exports = authenticateToken;
+module.exports = authMiddleware;

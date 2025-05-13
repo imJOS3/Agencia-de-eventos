@@ -1,10 +1,10 @@
-const apiClient = require('../utils/apiClient');
-
+const createApiClient = require('../utils/apiClient');
 
 // Obtener todos los pagos
 const getPagos = async (req, res) => {
   try {
-    const response = await apiClient.get('/pagos');
+    const apiClient = createApiClient(req.session.token);
+    const response = await apiClient.get('/api/pagos');
     res.json(response.data);
   } catch (error) {
     console.error('❌ Error al obtener pagos:', error.message);
@@ -16,7 +16,8 @@ const getPagos = async (req, res) => {
 const getPagoById = async (req, res) => {
   const { id } = req.params;
   try {
-    const response = await apiClient.get(`/pagos/${id}`);
+    const apiClient = createApiClient(req.session.token);
+    const response = await apiClient.get(`/api/pagos/${id}`);
     res.json(response.data);
   } catch (error) {
     console.error(`❌ Error al obtener pago con ID ${id}:`, error.message);
@@ -27,7 +28,8 @@ const getPagoById = async (req, res) => {
 // Crear un nuevo pago
 const createPago = async (req, res) => {
   try {
-    const response = await apiClient.post('/pagos', req.body);
+    const apiClient = createApiClient(req.session.token);
+    const response = await apiClient.post('/api/pagos', req.body);
     res.status(201).json(response.data);
   } catch (error) {
     console.error('❌ Error al crear pago:', error.message);
@@ -39,7 +41,8 @@ const createPago = async (req, res) => {
 const updatePago = async (req, res) => {
   const { id } = req.params;
   try {
-    const response = await apiClient.put(`/pagos/${id}`, req.body);
+    const apiClient = createApiClient(req.session.token);
+    const response = await apiClient.put(`/api/pagos/${id}`, req.body);
     res.json(response.data);
   } catch (error) {
     console.error(`❌ Error al actualizar pago con ID ${id}:`, error.message);
@@ -51,7 +54,8 @@ const updatePago = async (req, res) => {
 const deletePago = async (req, res) => {
   const { id } = req.params;
   try {
-    await apiClient.delete(`/pagos/${id}`);
+    const apiClient = createApiClient(req.session.token);
+    await apiClient.delete(`/api/pagos/${id}`);
     res.json({ message: 'Pago eliminado correctamente' });
   } catch (error) {
     console.error(`❌ Error al eliminar pago con ID ${id}:`, error.message);

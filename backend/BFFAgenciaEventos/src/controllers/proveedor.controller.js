@@ -1,9 +1,9 @@
-const apiClient = require('../utils/apiClient');
-
+const createApiClient = require('../utils/apiClient');
 
 const getProveedores = async (req, res) => {
   try {
-    const response = await apiClient.get('/proveedores');
+    const apiClient = createApiClient(req.session.token);
+    const response = await apiClient.get('/api/proveedores');
     res.json(response.data);
   } catch (error) {
     console.error('❌ Error al obtener proveedores:', error.message);
@@ -14,7 +14,8 @@ const getProveedores = async (req, res) => {
 const getProveedorById = async (req, res) => {
   const { id } = req.params;
   try {
-    const response = await apiClient.get(`/proveedores/${id}`);
+    const apiClient = createApiClient(req.session.token);
+    const response = await apiClient.get(`/api/proveedores/${id}`);
     res.json(response.data);
   } catch (error) {
     console.error(`❌ Error al obtener proveedor con ID ${id}:`, error.message);
@@ -24,7 +25,8 @@ const getProveedorById = async (req, res) => {
 
 const createProveedor = async (req, res) => {
   try {
-    const response = await apiClient.post('/proveedores', req.body);
+    const apiClient = createApiClient(req.session.token);
+    const response = await apiClient.post('/api/proveedores', req.body);
     res.status(201).json(response.data);
   } catch (error) {
     console.error('❌ Error al crear proveedor:', error.message);
@@ -35,7 +37,8 @@ const createProveedor = async (req, res) => {
 const updateProveedor = async (req, res) => {
   const { id } = req.params;
   try {
-    const response = await apiClient.put(`/proveedores/${id}`, req.body);
+    const apiClient = createApiClient(req.session.token);
+    const response = await apiClient.put(`/api/proveedores/${id}`, req.body);
     res.json(response.data);
   } catch (error) {
     console.error(`❌ Error al actualizar proveedor con ID ${id}:`, error.message);
@@ -46,7 +49,8 @@ const updateProveedor = async (req, res) => {
 const deleteProveedor = async (req, res) => {
   const { id } = req.params;
   try {
-    await apiClient.delete(`/proveedores/${id}`);
+    const apiClient = createApiClient(req.session.token);
+    await apiClient.delete(`/api/proveedores/${id}`);
     res.json({ message: 'Proveedor eliminado correctamente' });
   } catch (error) {
     console.error(`❌ Error al eliminar proveedor con ID ${id}:`, error.message);

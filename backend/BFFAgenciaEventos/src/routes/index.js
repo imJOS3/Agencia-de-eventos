@@ -10,8 +10,6 @@ router.use('/pagos', require('./pagos.routes'));
 router.use('/inventario', require('./inventario.routes'));
 router.use('/facturacion', require('./facturacion.routes'));
 router.use('/auth', require('./auth.routes'));
-
-
-
+router.use('/users', require('./users.routes'));
 
 module.exports = router;

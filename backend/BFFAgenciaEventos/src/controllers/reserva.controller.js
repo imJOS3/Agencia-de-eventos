@@ -1,10 +1,10 @@
-const apiClient = require('../utils/apiClient');
-
+const createApiClient = require('../utils/apiClient');
 
 // Obtener todas las reservas
 const getReservas = async (req, res) => {
   try {
-    const response = await apiClient.get('/reservas');
+    const apiClient = createApiClient(req.session.token);
+    const response = await apiClient.get('/api/reservas');
     res.json(response.data);
   } catch (error) {
     console.error('❌ Error al obtener reservas:', error.message);
@@ -16,7 +16,8 @@ const getReservas = async (req, res) => {
 const getReservaById = async (req, res) => {
   const { id } = req.params;
   try {
-    const response = await apiClient.get(`/reservas/${id}`);
+    const apiClient = createApiClient(req.session.token);
+    const response = await apiClient.get(`/api/reservas/${id}`);
     res.json(response.data);
   } catch (error) {
     console.error(`❌ Error al obtener reserva con ID ${id}:`, error.message);
@@ -27,7 +28,8 @@ const getReservaById = async (req, res) => {
 // Crear una nueva reserva
 const createReserva = async (req, res) => {
   try {
-    const response = await apiClient.post('/reservas', req.body);
+    const apiClient = createApiClient(req.session.token);
+    const response = await apiClient.post('/api/reservas', req.body);
     res.status(201).json(response.data);
   } catch (error) {
     console.error('❌ Error al crear reserva:', error.message);
@@ -39,7 +41,8 @@ const createReserva = async (req, res) => {
 const updateReserva = async (req, res) => {
   const { id } = req.params;
   try {
-    const response = await apiClient.put(`/reservas/${id}`, req.body);
+    const apiClient = createApiClient(req.session.token);
+    const response = await apiClient.put(`/api/reservas/${id}`, req.body);
     res.json(response.data);
   } catch (error) {
     console.error(`❌ Error al actualizar reserva con ID ${id}:`, error.message);
@@ -51,7 +54,8 @@ const updateReserva = async (req, res) => {
 const deleteReserva = async (req, res) => {
   const { id } = req.params;
   try {
-    await apiClient.delete(`/reservas/${id}`);
+    const apiClient = createApiClient(req.session.token);
+    await apiClient.delete(`/api/reservas/${id}`);
     res.json({ message: 'Reserva eliminada correctamente' });
   } catch (error) {
     console.error(`❌ Error al eliminar reserva con ID ${id}:`, error.message);
