@@ -1,29 +1,25 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Layout from "../components/Layout";
+import useClientesStore  from "../store/useClientesStore";
 
 export default function Clientes() {
+  const {
+    clientes,
+    clienteSeleccionado,
+    setClienteSeleccionado,
+    fetchClientes,
+    crearCliente,
+    actualizarCliente,
+    eliminarCliente,
+  } = useClientesStore();
+
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showViewModal, setShowViewModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
-  const [clienteSeleccionado, setClienteSeleccionado] = useState(null);
-  const [clientes, setClientes] = useState([
-    {
-      id: 1,
-      nombre: "Ana Martínez",
-      correo: "ana.martinez@example.com",
-      telefono: "3124567890",
-      ciudad: "Bogotá",
-      registrado: "2025-04-01",
-    },
-    {
-      id: 2,
-      nombre: "Julián Torres",
-      correo: "julian.torres@example.com",
-      telefono: "3001234567",
-      ciudad: "Medellín",
-      registrado: "2025-03-15",
-    },
-  ]);
+
+  useEffect(() => {
+    fetchClientes(); // carga inicial desde la API
+  }, []);
 
   const abrirModalVer = (cliente) => {
     setClienteSeleccionado(cliente);
@@ -35,23 +31,21 @@ export default function Clientes() {
     setShowEditModal(true);
   };
 
-  const handleCrearCliente = (e) => {
+  const handleCrearCliente = async (e) => {
     e.preventDefault();
     const form = e.target;
     const nuevoCliente = {
-      id: clientes.length + 1,
       nombre: form.nombre.value,
       correo: form.correo.value,
       telefono: form.telefono.value,
       ciudad: form.ciudad.value,
-      registrado: new Date().toISOString().slice(0, 10),
     };
-    setClientes([...clientes, nuevoCliente]);
+    await crearCliente(nuevoCliente);
     setShowCreateModal(false);
     form.reset();
   };
 
-  const handleEditarCliente = (e) => {
+  const handleEditarCliente = async (e) => {
     e.preventDefault();
     const form = e.target;
     const actualizado = {
@@ -61,171 +55,174 @@ export default function Clientes() {
       telefono: form.telefono.value,
       ciudad: form.ciudad.value,
     };
-    setClientes(clientes.map((c) => (c.id === actualizado.id ? actualizado : c)));
+    await actualizarCliente(actualizado);
     setShowEditModal(false);
   };
 
-  const eliminarCliente = (id) => {
+  const handleEliminar = async (id) => {
     if (confirm("¿Estás seguro de eliminar este cliente?")) {
-      setClientes(clientes.filter((c) => c.id !== id));
+      await eliminarCliente(id);
     }
   };
 
   return (
     <Layout>
-      <div className="p-5">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold">Clientes</h1>
-          <button
-            onClick={() => setShowCreateModal(true)}
-            className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg transition duration-300"
-          >
-            + Agregar Cliente
-          </button>
-        </div>
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="text-2xl font-bold">Clientes</h1>
+        <button
+          onClick={() => setShowCreateModal(true)}
+          className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+        >
+          Nuevo Cliente
+        </button>
+      </div>
 
-        <div className="overflow-x-auto bg-white rounded-xl shadow-md">
-          <table className="min-w-full text-sm text-left">
-            <thead className="bg-gray-100 text-gray-600 uppercase text-xs">
+      <div className="overflow-x-auto">
+        <table className="w-full table-auto border-collapse">
+          <thead>
+            <tr className="bg-gray-200">
+              <th className="px-4 py-2">Nombre</th>
+              <th className="px-4 py-2">Correo</th>
+              <th className="px-4 py-2">Teléfono</th>
+              <th className="px-4 py-2">Ciudad</th>
+              <th className="px-4 py-2">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {clientes.length === 0 ? (
               <tr>
-                <th className="px-6 py-4">Nombre</th>
-                <th className="px-6 py-4">Correo</th>
-                <th className="px-6 py-4">Teléfono</th>
-                <th className="px-6 py-4">Ciudad</th>
-                <th className="px-6 py-4">Registrado</th>
-                <th className="px-6 py-4 text-center">Acciones</th>
+                <td colSpan="5" className="text-center py-4">
+                  No hay clientes registrados.
+                </td>
               </tr>
-            </thead>
-            <tbody>
-              {clientes.map((cliente) => (
-                <tr key={cliente.id} className="border-b hover:bg-gray-50">
-                  <td className="px-6 py-4 font-medium">{cliente.nombre}</td>
-                  <td className="px-6 py-4">{cliente.correo}</td>
-                  <td className="px-6 py-4">{cliente.telefono}</td>
-                  <td className="px-6 py-4">{cliente.ciudad}</td>
-                  <td className="px-6 py-4">{cliente.registrado}</td>
-                  <td className="px-6 py-4 text-center space-x-2">
+            ) : (
+              clientes.map((cliente) => (
+                <tr key={cliente.id} className="border-t">
+                  <td className="px-4 py-2">{cliente.nombre}</td>
+                  <td className="px-4 py-2">{cliente.correo}</td>
+                  <td className="px-4 py-2">{cliente.telefono}</td>
+                  <td className="px-4 py-2">{cliente.ciudad}</td>
+                  <td className="px-4 py-2 space-x-2">
                     <button
                       onClick={() => abrirModalVer(cliente)}
-                      className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-md text-sm"
+                      className="text-blue-600 hover:underline"
                     >
                       Ver
                     </button>
                     <button
                       onClick={() => abrirModalEditar(cliente)}
-                      className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded-md text-sm"
+                      className="text-yellow-600 hover:underline"
                     >
                       Editar
                     </button>
                     <button
-                      onClick={() => eliminarCliente(cliente.id)}
-                      className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md text-sm"
+                      onClick={() => handleEliminar(cliente.id)}
+                      className="text-red-600 hover:underline"
                     >
                       Eliminar
                     </button>
                   </td>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        {/* Modal Crear Cliente */}
-        {showCreateModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white p-6 rounded-xl shadow-lg w-full max-w-md">
-              <h2 className="text-xl font-semibold mb-4">Nuevo Cliente</h2>
-              <form onSubmit={handleCrearCliente} className="space-y-4">
-                <InputField name="nombre" label="Nombre" />
-                <InputField name="correo" label="Correo" type="email" />
-                <InputField name="telefono" label="Teléfono" type="tel" />
-                <InputField name="ciudad" label="Ciudad" />
-                <div className="flex justify-end pt-4 space-x-2">
-                  <Button onClick={() => setShowCreateModal(false)} text="Cancelar" type="button" />
-                  <Button text="Guardar" type="submit" color="primary" />
-                </div>
-              </form>
-            </div>
-          </div>
-        )}
-
-        {/* Modal Ver Cliente */}
-        {showViewModal && clienteSeleccionado && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white p-6 rounded-xl shadow-lg w-full max-w-md">
-              <h2 className="text-xl font-semibold mb-6">Detalle del Cliente</h2>
-              <div className="space-y-4">
-                <InfoField label="Nombre" value={clienteSeleccionado.nombre} />
-                <InfoField label="Correo" value={clienteSeleccionado.correo} />
-                <InfoField label="Teléfono" value={clienteSeleccionado.telefono} />
-                <InfoField label="Ciudad" value={clienteSeleccionado.ciudad} />
-                <InfoField label="Registrado" value={clienteSeleccionado.registrado} />
-              </div>
-              <div className="flex justify-end pt-6">
-                <Button onClick={() => setShowViewModal(false)} text="Cerrar" />
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Modal Editar Cliente */}
-        {showEditModal && clienteSeleccionado && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white p-6 rounded-xl shadow-lg w-full max-w-md">
-              <h2 className="text-xl font-semibold mb-4">Editar Cliente</h2>
-              <form onSubmit={handleEditarCliente} className="space-y-4">
-                <InputField name="nombre" label="Nombre" defaultValue={clienteSeleccionado.nombre} />
-                <InputField name="correo" label="Correo" type="email" defaultValue={clienteSeleccionado.correo} />
-                <InputField name="telefono" label="Teléfono" type="tel" defaultValue={clienteSeleccionado.telefono} />
-                <InputField name="ciudad" label="Ciudad" defaultValue={clienteSeleccionado.ciudad} />
-                <div className="flex justify-end pt-4 space-x-2">
-                  <Button onClick={() => setShowEditModal(false)} text="Cancelar" type="button" />
-                  <Button text="Actualizar" type="submit" color="primary" />
-                </div>
-              </form>
-            </div>
-          </div>
-        )}
+              ))
+            )}
+          </tbody>
+        </table>
       </div>
+
+      {/* Modal Crear */}
+      {showCreateModal && (
+        <div className="modal">
+          <div className="modal-content">
+            <h2 className="text-xl font-bold mb-2">Nuevo Cliente</h2>
+            <form onSubmit={handleCrearCliente}>
+              <input type="text" name="nombre" placeholder="Nombre" required />
+              <input type="email" name="correo" placeholder="Correo" required />
+              <input type="text" name="telefono" placeholder="Teléfono" required />
+              <input type="text" name="ciudad" placeholder="Ciudad" required />
+              <div className="mt-4 flex justify-end space-x-2">
+                <button type="submit" className="btn btn-primary">
+                  Guardar
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={() => setShowCreateModal(false)}
+                >
+                  Cancelar
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Ver */}
+      {showViewModal && clienteSeleccionado && (
+        <div className="modal">
+          <div className="modal-content">
+            <h2 className="text-xl font-bold mb-2">Detalle del Cliente</h2>
+            <p><strong>Nombre:</strong> {clienteSeleccionado.nombre}</p>
+            <p><strong>Correo:</strong> {clienteSeleccionado.correo}</p>
+            <p><strong>Teléfono:</strong> {clienteSeleccionado.telefono}</p>
+            <p><strong>Ciudad:</strong> {clienteSeleccionado.ciudad}</p>
+            <div className="mt-4 text-right">
+              <button
+                className="btn btn-secondary"
+                onClick={() => setShowViewModal(false)}
+              >
+                Cerrar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Editar */}
+      {showEditModal && clienteSeleccionado && (
+        <div className="modal">
+          <div className="modal-content">
+            <h2 className="text-xl font-bold mb-2">Editar Cliente</h2>
+            <form onSubmit={handleEditarCliente}>
+              <input
+                type="text"
+                name="nombre"
+                defaultValue={clienteSeleccionado.nombre}
+                required
+              />
+              <input
+                type="email"
+                name="correo"
+                defaultValue={clienteSeleccionado.correo}
+                required
+              />
+              <input
+                type="text"
+                name="telefono"
+                defaultValue={clienteSeleccionado.telefono}
+                required
+              />
+              <input
+                type="text"
+                name="ciudad"
+                defaultValue={clienteSeleccionado.ciudad}
+                required
+              />
+              <div className="mt-4 flex justify-end space-x-2">
+                <button type="submit" className="btn btn-primary">
+                  Guardar
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={() => setShowEditModal(false)}
+                >
+                  Cancelar
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </Layout>
-  );
-}
-
-function InputField({ name, label, type = "text", defaultValue = "" }) {
-  return (
-    <div>
-      <label className="block text-sm text-gray-700">{label}</label>
-      <input
-        name={name}
-        type={type}
-        defaultValue={defaultValue}
-        className="w-full mt-1 p-2 border border-gray-300 rounded-lg"
-      />
-    </div>
-  );
-}
-
-function InfoField({ label, value }) {
-  return (
-    <div>
-      <p className="text-gray-500 text-sm">{label}</p>
-      <p className="text-lg font-semibold">{value}</p>
-    </div>
-  );
-}
-
-function Button({ onClick, text, type = "button", color = "gray" }) {
-  const colors = {
-    gray: "bg-gray-300 hover:bg-gray-400 text-gray-800",
-    primary: "bg-indigo-600 hover:bg-indigo-700 text-white",
-  };
-  return (
-    <button
-      type={type}
-      onClick={onClick}
-      className={`px-4 py-2 rounded-lg ${colors[color]}`}
-    >
-      {text}
-    </button>
   );
 }

@@ -1,227 +1,125 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Layout from "../components/Layout";
+import { usePagosStore } from "../store/usePagosStore";
 
 export default function Pagos() {
-  const [showModal, setShowModal] = useState(false);
-  const [nuevoPago, setNuevoPago] = useState({
-    factura: "",
-    cliente: "",
-    monto: "",
-    metodo: "Transferencia",
-    fecha: "",
-  });
-  const [pagos, setPagos] = useState([
-    {
-      id: 1,
-      factura: "#F-001",
-      cliente: "María López",
-      monto: 500000,
-      metodo: "Transferencia",
-      fecha: "2025-04-16",
-      estado: "Confirmado",
-    },
-    {
-      id: 2,
-      factura: "#F-002",
-      cliente: "Carlos Méndez",
-      monto: 850000,
-      metodo: "Efectivo",
-      fecha: "2025-04-18",
-      estado: "Pendiente",
-    },
-  ]);
-  const [selectedPago, setSelectedPago] = useState(null); // Estado para el pago seleccionado
+  const {
+    pagos,
+    getPagos,
+    crearPago,
+    eliminarPago,
+  } = usePagosStore();
+
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [form, setForm] = useState({ monto: "", metodo: "" });
+
+  useEffect(() => {
+    getPagos(); // Cargar pagos al iniciar
+  }, []);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setNuevoPago({ ...nuevoPago, [name]: value });
+    setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmitCrear = async (e) => {
     e.preventDefault();
-    const nuevoPagoConId = {
-      ...nuevoPago,
-      id: pagos.length + 1, // Generamos un id simple
-      estado: "Pendiente", // Estado inicial
-    };
-    setPagos([...pagos, nuevoPagoConId]); // Agregar el nuevo pago al estado
-    setShowModal(false); // Cerrar el modal
-    setNuevoPago({
-      factura: "",
-      cliente: "",
-      monto: "",
-      metodo: "Transferencia",
-      fecha: "",
-    }); // Resetear el formulario
+    await crearPago(form);
+    setForm({ monto: "", metodo: "" });
+    setShowCreateModal(false);
   };
 
-  const handleVer = (pago) => {
-    setSelectedPago(pago); // Establecer el pago seleccionado
-    setShowModal(true); // Mostrar el modal con los detalles
+  const handleEliminar = async (id) => {
+    if (confirm("¿Estás seguro de eliminar este pago?")) {
+      await eliminarPago(id);
+    }
   };
 
   return (
     <Layout>
-      <div className="p-5">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold">Pagos</h1>
-          <button
-            onClick={() => setShowModal(true)}
-            className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg transition duration-300"
-          >
-            + Registrar Pago
-          </button>
-        </div>
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="text-2xl font-bold">Pagos</h1>
+        <button
+          onClick={() => setShowCreateModal(true)}
+          className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+        >
+          Nuevo Pago
+        </button>
+      </div>
 
-        <div className="overflow-x-auto bg-white rounded-xl shadow-md">
-          <table className="min-w-full text-sm text-left">
-            <thead className="bg-gray-100 text-gray-600 uppercase text-xs">
+      <div className="overflow-x-auto">
+        <table className="w-full table-auto border-collapse">
+          <thead>
+            <tr className="bg-gray-200">
+              <th className="px-4 py-2">Monto</th>
+              <th className="px-4 py-2">Método</th>
+              <th className="px-4 py-2">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {pagos.length === 0 ? (
               <tr>
-                <th className="px-6 py-4">Factura</th>
-                <th className="px-6 py-4">Cliente</th>
-                <th className="px-6 py-4">Monto</th>
-                <th className="px-6 py-4">Método</th>
-                <th className="px-6 py-4">Fecha</th>
-                <th className="px-6 py-4">Estado</th>
-                <th className="px-6 py-4 text-center">Acciones</th>
+                <td colSpan="3" className="text-center py-4">
+                  No hay pagos registrados.
+                </td>
               </tr>
-            </thead>
-            <tbody>
-              {pagos.map((pago) => (
-                <tr key={pago.id} className="border-b hover:bg-gray-50">
-                  <td className="px-6 py-4 font-medium">{pago.factura}</td>
-                  <td className="px-6 py-4">{pago.cliente}</td>
-                  <td className="px-6 py-4">${pago.monto.toLocaleString()}</td>
-                  <td className="px-6 py-4">{pago.metodo}</td>
-                  <td className="px-6 py-4">{pago.fecha}</td>
-                  <td className="px-6 py-4">
-                    <span
-                      className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                        pago.estado === "Confirmado"
-                          ? "bg-green-100 text-green-700"
-                          : "bg-yellow-100 text-yellow-700"
-                      }`}
-                    >
-                      {pago.estado}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 text-center">
+            ) : (
+              pagos.map((pago) => (
+                <tr key={pago.id} className="border-t">
+                  <td className="px-4 py-2">{pago.monto}</td>
+                  <td className="px-4 py-2">{pago.metodo}</td>
+                  <td className="px-4 py-2 space-x-2">
                     <button
-                      onClick={() => handleVer(pago)}
-                      className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-md text-sm"
+                      onClick={() => handleEliminar(pago.id)}
+                      className="text-red-600 hover:underline"
                     >
-                      Ver
+                      Eliminar
                     </button>
                   </td>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
 
-        {showModal && selectedPago && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white p-6 rounded-xl shadow-lg w-full max-w-md">
-              <h2 className="text-xl font-semibold mb-4">Detalles del Pago</h2>
-              <div className="space-y-4">
-                <p><strong>Factura:</strong> {selectedPago.factura}</p>
-                <p><strong>Cliente:</strong> {selectedPago.cliente}</p>
-                <p><strong>Monto:</strong> ${selectedPago.monto.toLocaleString()}</p>
-                <p><strong>Método de Pago:</strong> {selectedPago.metodo}</p>
-                <p><strong>Fecha:</strong> {selectedPago.fecha}</p>
-                <p><strong>Estado:</strong> {selectedPago.estado}</p>
-              </div>
-              <div className="flex justify-end pt-4">
+      {/* Modal Crear */}
+      {showCreateModal && (
+        <div className="modal">
+          <div className="modal-content">
+            <h2 className="text-xl font-bold mb-2">Nuevo Pago</h2>
+            <form onSubmit={handleSubmitCrear}>
+              <input
+                type="text"
+                name="monto"
+                value={form.monto}
+                onChange={handleChange}
+                placeholder="Monto"
+                required
+              />
+              <input
+                type="text"
+                name="metodo"
+                value={form.metodo}
+                onChange={handleChange}
+                placeholder="Método de Pago"
+                required
+              />
+              <div className="mt-4 flex justify-end space-x-2">
+                <button type="submit" className="btn btn-primary">
+                  Guardar
+                </button>
                 <button
-                  onClick={() => setShowModal(false)}
-                  className="px-4 py-2 rounded-lg bg-gray-300 hover:bg-gray-400 text-gray-800"
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={() => setShowCreateModal(false)}
                 >
-                  Cerrar
+                  Cancelar
                 </button>
               </div>
-            </div>
+            </form>
           </div>
-        )}
-
-        {showModal && !selectedPago && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white p-6 rounded-xl shadow-lg w-full max-w-md">
-              <h2 className="text-xl font-semibold mb-4">Registrar nuevo pago</h2>
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div>
-                  <label className="block text-sm text-gray-700">Factura</label>
-                  <input
-                    type="text"
-                    name="factura"
-                    value={nuevoPago.factura}
-                    onChange={handleChange}
-                    className="w-full mt-1 p-2 border border-gray-300 rounded-lg focus:ring focus:ring-indigo-300"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm text-gray-700">Cliente</label>
-                  <input
-                    type="text"
-                    name="cliente"
-                    value={nuevoPago.cliente}
-                    onChange={handleChange}
-                    className="w-full mt-1 p-2 border border-gray-300 rounded-lg focus:ring focus:ring-indigo-300"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm text-gray-700">Monto</label>
-                  <input
-                    type="number"
-                    name="monto"
-                    value={nuevoPago.monto}
-                    onChange={handleChange}
-                    className="w-full mt-1 p-2 border border-gray-300 rounded-lg focus:ring focus:ring-indigo-300"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm text-gray-700">Método de pago</label>
-                  <select
-                    name="metodo"
-                    value={nuevoPago.metodo}
-                    onChange={handleChange}
-                    className="w-full mt-1 p-2 border border-gray-300 rounded-lg"
-                  >
-                    <option>Transferencia</option>
-                    <option>Efectivo</option>
-                    <option>Tarjeta</option>
-                    <option>Otro</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm text-gray-700">Fecha</label>
-                  <input
-                    type="date"
-                    name="fecha"
-                    value={nuevoPago.fecha}
-                    onChange={handleChange}
-                    className="w-full mt-1 p-2 border border-gray-300 rounded-lg focus:ring focus:ring-indigo-300"
-                  />
-                </div>
-                <div className="flex justify-end space-x-2 pt-4">
-                  <button
-                    type="button"
-                    onClick={() => setShowModal(false)}
-                    className="px-4 py-2 rounded-lg bg-gray-300 hover:bg-gray-400 text-gray-800"
-                  >
-                    Cancelar
-                  </button>
-                  <button
-                    type="submit"
-                    className="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white"
-                  >
-                    Registrar
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        )}
-      </div>
+        </div>
+      )}
     </Layout>
   );
 }

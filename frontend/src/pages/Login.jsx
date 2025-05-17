@@ -1,17 +1,22 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useAuthStore } from '../store/useAuthStore'
 
 function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [error, setError] = useState('')
   const navigate = useNavigate()
 
-  const handleLogin = (e) => {
+  const login = useAuthStore((state) => state.login)
+  const error = useAuthStore((state) => state.error)
+  const loading = useAuthStore((state) => state.loading)
+
+  const handleLogin = async (e) => {
     e.preventDefault()
-    // Aquí solo manejamos el login visual (sin conexión al backend)
-    // Cuando se loguee correctamente, redirigimos al Dashboard
-    navigate('/dashboard')
+    const success = await login({ email, password })
+    if (success) {
+      navigate('/dashboard') // ✅ Redirigir si login fue exitoso
+    }
   }
 
   return (
@@ -42,7 +47,13 @@ function Login() {
               className="w-full p-2 mt-1 border border-gray-300 rounded-md"
             />
           </div>
-          <button type="submit" className="w-full bg-blue-500 text-white py-2 rounded-md">Iniciar sesión</button>
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 transition"
+          >
+            {loading ? 'Cargando...' : 'Iniciar sesión'}
+          </button>
         </form>
         <p className="text-center mt-4">
           ¿No tienes cuenta? <a href="/register" className="text-blue-500">Registrarse</a>

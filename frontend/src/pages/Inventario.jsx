@@ -1,316 +1,208 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Layout from "../components/Layout";
+import { useInventarioStore } from "../store/useInventarioStore";
 
 export default function Inventario() {
-  const [showModal, setShowModal] = useState(false);
+  const {
+    inventario,
+    productoSeleccionado,
+    setProductoSeleccionado,
+    fetchInventario,
+    crearProducto,
+    actualizarProducto,
+    eliminarProducto,
+  } = useInventarioStore();
+
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showViewModal, setShowViewModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [selectedItem, setSelectedItem] = useState(null);
-  const [newItem, setNewItem] = useState({
-    nombre: "",
-    categoria: "",
-    cantidad: 0,
-    estado: "Disponible",
-  });
 
-  const [inventario, setInventario] = useState([
-    {
-      id: 1,
-      nombre: "Silla Tiffany Blanca",
-      categoria: "Mobiliario",
-      cantidad: 120,
-      estado: "Disponible",
-    },
-    {
-      id: 2,
-      nombre: "Carpa 4x4m",
-      categoria: "Estructuras",
-      cantidad: 4,
-      estado: "Mantenimiento",
-    },
-    {
-      id: 3,
-      nombre: "Luces LED RGB",
-      categoria: "Iluminación",
-      cantidad: 60,
-      estado: "Disponible",
-    },
-  ]);
+  useEffect(() => {
+    fetchInventario();
+  }, []);
 
-  // Funciones para manejar el modal de ver, editar, eliminar y agregar
-  const handleVer = (item) => {
-    setSelectedItem(item);
-    setShowModal(true);
+  const abrirModalVer = (producto) => {
+    setProductoSeleccionado(producto);
+    setShowViewModal(true);
   };
 
-  const handleEditar = (item) => {
-    setSelectedItem(item);
+  const abrirModalEditar = (producto) => {
+    setProductoSeleccionado(producto);
     setShowEditModal(true);
   };
 
-  const handleEliminar = (item) => {
-    setSelectedItem(item);
-    setShowDeleteModal(true);
+  const handleCrearProducto = async (e) => {
+    e.preventDefault();
+    const form = e.target;
+    const nuevoProducto = {
+      nombre: form.nombre.value,
+      categoria: form.categoria.value,
+      cantidad: form.cantidad.value,
+      precio: form.precio.value,
+    };
+    await crearProducto(nuevoProducto);
+    setShowCreateModal(false);
+    form.reset();
   };
 
-  const handleGuardarEdicion = (event) => {
-    event.preventDefault();
-    const updatedInventario = inventario.map((item) =>
-      item.id === selectedItem.id ? { ...selectedItem } : item
-    );
-    setInventario(updatedInventario);
+  const handleEditarProducto = async (e) => {
+    e.preventDefault();
+    const form = e.target;
+    const actualizado = {
+      ...productoSeleccionado,
+      nombre: form.nombre.value,
+      categoria: form.categoria.value,
+      cantidad: form.cantidad.value,
+      precio: form.precio.value,
+    };
+    await actualizarProducto(actualizado);
     setShowEditModal(false);
   };
 
-  const handleEliminarArticulo = () => {
-    const updatedInventario = inventario.filter(
-      (item) => item.id !== selectedItem.id
-    );
-    setInventario(updatedInventario);
-    setShowDeleteModal(false);
-  };
-
-  const handleAgregarArticulo = (event) => {
-    event.preventDefault();
-    const newId = inventario.length ? inventario[inventario.length - 1].id + 1 : 1;
-    const newArticulo = { ...newItem, id: newId };
-    setInventario([...inventario, newArticulo]);
-    setShowModal(false);
-    setNewItem({ nombre: "", categoria: "", cantidad: 0, estado: "Disponible" });
+  const handleEliminar = async (id) => {
+    if (confirm("¿Estás seguro de eliminar este producto?")) {
+      await eliminarProducto(id);
+    }
   };
 
   return (
     <Layout>
-      <div className="p-5">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold">Inventario</h1>
-          <button
-            onClick={() => setShowModal(true)}
-            className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition duration-300"
-          >
-            + Nuevo Artículo
-          </button>
-        </div>
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="text-2xl font-bold">Inventario</h1>
+        <button
+          onClick={() => setShowCreateModal(true)}
+          className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
+        >
+          Nuevo Producto
+        </button>
+      </div>
 
-        <div className="overflow-x-auto bg-white rounded-xl shadow-md">
-          <table className="min-w-full text-sm text-left">
-            <thead className="bg-gray-100 text-gray-600 uppercase text-xs">
+      <div className="overflow-x-auto">
+        <table className="w-full table-auto border-collapse">
+          <thead>
+            <tr className="bg-gray-200">
+              <th className="px-4 py-2">Nombre</th>
+              <th className="px-4 py-2">Categoría</th>
+              <th className="px-4 py-2">Cantidad</th>
+              <th className="px-4 py-2">Precio</th>
+              <th className="px-4 py-2">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {inventario.length === 0 ? (
               <tr>
-                <th className="px-6 py-4">Artículo</th>
-                <th className="px-6 py-4">Categoría</th>
-                <th className="px-6 py-4">Cantidad</th>
-                <th className="px-6 py-4">Estado</th>
-                <th className="px-6 py-4 text-center">Acciones</th>
+                <td colSpan="5" className="text-center py-4">
+                  No hay productos registrados.
+                </td>
               </tr>
-            </thead>
-            <tbody>
-              {inventario.map((item) => (
-                <tr key={item.id} className="border-b hover:bg-gray-50">
-                  <td className="px-6 py-4 font-medium text-gray-800">{item.nombre}</td>
-                  <td className="px-6 py-4">{item.categoria}</td>
-                  <td className="px-6 py-4">{item.cantidad}</td>
-                  <td className="px-6 py-4">
-                    <span
-                      className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                        item.estado === "Disponible"
-                          ? "bg-green-100 text-green-600"
-                          : "bg-yellow-100 text-yellow-700"
-                      }`}
-                    >
-                      {item.estado}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 text-center space-x-2">
+            ) : (
+              inventario.map((producto) => (
+                <tr key={producto.id} className="border-t">
+                  <td className="px-4 py-2">{producto.nombre}</td>
+                  <td className="px-4 py-2">{producto.categoria}</td>
+                  <td className="px-4 py-2">{producto.cantidad}</td>
+                  <td className="px-4 py-2">{producto.precio}</td>
+                  <td className="px-4 py-2 space-x-2">
                     <button
-                      onClick={() => handleVer(item)}
-                      className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-md text-sm"
+                      onClick={() => abrirModalVer(producto)}
+                      className="text-blue-600 hover:underline"
                     >
                       Ver
                     </button>
                     <button
-                      onClick={() => handleEditar(item)}
-                      className="bg-yellow-400 hover:bg-yellow-500 text-white px-3 py-1 rounded-md text-sm"
+                      onClick={() => abrirModalEditar(producto)}
+                      className="text-yellow-600 hover:underline"
                     >
                       Editar
                     </button>
                     <button
-                      onClick={() => handleEliminar(item)}
-                      className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md text-sm"
+                      onClick={() => handleEliminar(producto.id)}
+                      className="text-red-600 hover:underline"
                     >
                       Eliminar
                     </button>
                   </td>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
 
-        {/* Modal Ver */}
-        {showModal && selectedItem && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white p-6 rounded-xl shadow-lg w-full max-w-md">
-              <h2 className="text-xl font-semibold mb-4">Detalles del Artículo</h2>
-              <div>
-                <p><strong>Nombre del Artículo:</strong> {selectedItem.nombre}</p>
-                <p><strong>Categoría:</strong> {selectedItem.categoria}</p>
-                <p><strong>Cantidad:</strong> {selectedItem.cantidad}</p>
-                <p><strong>Estado:</strong>
-                  <span
-                    className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                      selectedItem.estado === "Disponible"
-                        ? "bg-green-100 text-green-600"
-                        : "bg-yellow-100 text-yellow-700"
-                    }`}
-                  >
-                    {selectedItem.estado}
-                  </span>
-                </p>
-              </div>
-              <div className="flex justify-end pt-4 space-x-2">
-                <button
-                  onClick={() => setShowModal(false)}
-                  className="px-4 py-2 rounded-lg bg-gray-300 hover:bg-gray-400 text-gray-800"
-                >
-                  Cerrar
+      {/* Modal Crear */}
+      {showCreateModal && (
+        <div className="modal">
+          <div className="modal-content">
+            <h2 className="text-xl font-bold mb-2">Nuevo Producto</h2>
+            <form onSubmit={handleCrearProducto}>
+              <input type="text" name="nombre" placeholder="Nombre" required />
+              <input type="text" name="categoria" placeholder="Categoría" required />
+              <input type="number" name="cantidad" placeholder="Cantidad" required />
+              <input type="number" name="precio" placeholder="Precio" required />
+              <div className="mt-4 flex justify-end space-x-2">
+                <button type="submit" className="btn btn-primary">
+                  Guardar
                 </button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Modal Editar */}
-        {showEditModal && selectedItem && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white p-6 rounded-xl shadow-lg w-full max-w-md">
-              <h2 className="text-xl font-semibold mb-4">Editar Artículo</h2>
-              <form onSubmit={handleGuardarEdicion} className="space-y-4">
-                <div>
-                  <label className="block text-sm text-gray-700">Nombre del Artículo</label>
-                  <input
-                    type="text"
-                    value={selectedItem.nombre}
-                    onChange={(e) => setSelectedItem({ ...selectedItem, nombre: e.target.value })}
-                    className="w-full mt-1 p-2 border border-gray-300 rounded-lg focus:ring focus:ring-green-300"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm text-gray-700">Categoría</label>
-                  <input
-                    type="text"
-                    value={selectedItem.categoria}
-                    onChange={(e) => setSelectedItem({ ...selectedItem, categoria: e.target.value })}
-                    className="w-full mt-1 p-2 border border-gray-300 rounded-lg focus:ring focus:ring-green-300"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm text-gray-700">Cantidad</label>
-                  <input
-                    type="number"
-                    value={selectedItem.cantidad}
-                    onChange={(e) => setSelectedItem({ ...selectedItem, cantidad: e.target.value })}
-                    min="0"
-                    className="w-full mt-1 p-2 border border-gray-300 rounded-lg focus:ring focus:ring-green-300"
-                  />
-                </div>
-                <div className="flex justify-end space-x-2 pt-4">
-                  <button
-                    type="button"
-                    onClick={() => setShowEditModal(false)}
-                    className="px-4 py-2 rounded-lg bg-gray-300 hover:bg-gray-400 text-gray-800"
-                  >
-                    Cancelar
-                  </button>
-                  <button
-                    type="submit"
-                    className="px-4 py-2 rounded-lg bg-green-600 hover:bg-green-700 text-white"
-                  >
-                    Guardar
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        )}
-
-        {/* Modal Eliminar */}
-        {showDeleteModal && selectedItem && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white p-6 rounded-xl shadow-lg w-full max-w-md">
-              <h2 className="text-xl font-semibold mb-4">Eliminar Artículo</h2>
-              <p>¿Estás seguro de que deseas eliminar el artículo "{selectedItem.nombre}"?</p>
-              <div className="flex justify-end pt-4 space-x-2">
                 <button
-                  onClick={() => setShowDeleteModal(false)}
-                  className="px-4 py-2 rounded-lg bg-gray-300 hover:bg-gray-400 text-gray-800"
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={() => setShowCreateModal(false)}
                 >
                   Cancelar
                 </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Ver */}
+      {showViewModal && productoSeleccionado && (
+        <div className="modal">
+          <div className="modal-content">
+            <h2 className="text-xl font-bold mb-2">Detalle del Producto</h2>
+            <p><strong>Nombre:</strong> {productoSeleccionado.nombre}</p>
+            <p><strong>Categoría:</strong> {productoSeleccionado.categoria}</p>
+            <p><strong>Cantidad:</strong> {productoSeleccionado.cantidad}</p>
+            <p><strong>Precio:</strong> ${productoSeleccionado.precio}</p>
+            <div className="mt-4 text-right">
+              <button
+                className="btn btn-secondary"
+                onClick={() => setShowViewModal(false)}
+              >
+                Cerrar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Editar */}
+      {showEditModal && productoSeleccionado && (
+        <div className="modal">
+          <div className="modal-content">
+            <h2 className="text-xl font-bold mb-2">Editar Producto</h2>
+            <form onSubmit={handleEditarProducto}>
+              <input type="text" name="nombre" defaultValue={productoSeleccionado.nombre} required />
+              <input type="text" name="categoria" defaultValue={productoSeleccionado.categoria} required />
+              <input type="number" name="cantidad" defaultValue={productoSeleccionado.cantidad} required />
+              <input type="number" name="precio" defaultValue={productoSeleccionado.precio} required />
+              <div className="mt-4 flex justify-end space-x-2">
+                <button type="submit" className="btn btn-primary">
+                  Guardar
+                </button>
                 <button
-                  onClick={handleEliminarArticulo}
-                  className="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white"
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={() => setShowEditModal(false)}
                 >
-                  Eliminar
+                  Cancelar
                 </button>
               </div>
-            </div>
+            </form>
           </div>
-        )}
-
-        {/* Modal para agregar artículo */}
-        {showModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white p-6 rounded-xl shadow-lg w-full max-w-md">
-              <h2 className="text-xl font-semibold mb-4">Agregar Nuevo Artículo</h2>
-              <form onSubmit={handleAgregarArticulo} className="space-y-4">
-                <div>
-                  <label className="block text-sm text-gray-700">Nombre del Artículo</label>
-                  <input
-                    type="text"
-                    value={newItem.nombre}
-                    onChange={(e) => setNewItem({ ...newItem, nombre: e.target.value })}
-                    className="w-full mt-1 p-2 border border-gray-300 rounded-lg focus:ring focus:ring-green-300"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm text-gray-700">Categoría</label>
-                  <input
-                    type="text"
-                    value={newItem.categoria}
-                    onChange={(e) => setNewItem({ ...newItem, categoria: e.target.value })}
-                    className="w-full mt-1 p-2 border border-gray-300 rounded-lg focus:ring focus:ring-green-300"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm text-gray-700">Cantidad</label>
-                  <input
-                    type="number"
-                    value={newItem.cantidad}
-                    onChange={(e) => setNewItem({ ...newItem, cantidad: e.target.value })}
-                    min="0"
-                    className="w-full mt-1 p-2 border border-gray-300 rounded-lg focus:ring focus:ring-green-300"
-                  />
-                </div>
-                <div className="flex justify-end space-x-2 pt-4">
-                  <button
-                    type="button"
-                    onClick={() => setShowModal(false)}
-                    className="px-4 py-2 rounded-lg bg-gray-300 hover:bg-gray-400 text-gray-800"
-                  >
-                    Cancelar
-                  </button>
-                  <button
-                    type="submit"
-                    className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white"
-                  >
-                    Agregar
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        )}
-      </div>
+        </div>
+      )}
     </Layout>
   );
 }
