@@ -220,6 +220,29 @@ services:
     networks:
       - erp-net
 
+  msvc-employees:
+    build:
+      context: ./msvc-employees
+    container_name: msvc-employees
+    hostname: msvc-employees
+    ports:
+      - "8017:8017"
+    depends_on:
+      config:
+        condition: service_healthy
+      eureka:
+        condition: service_healthy
+      mysql:
+        condition: service_healthy
+    environment:
+      - SPRING_PROFILES_ACTIVE=default
+      - SPRING_CONFIG_IMPORT=optional:configserver:http://config-server:8888
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/agencia_eventos_db
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=tu_contraseña
+    networks:
+      - erp-net
+
   msvc-gateway:
     build:
       context: ./msvc-gateway

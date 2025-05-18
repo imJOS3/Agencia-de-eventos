@@ -27,6 +27,8 @@
 		<module>msvc-inventario</module>
 		<module>msvc-pagos</module>
 		<module>msvc-proveedores</module>
+		<module>msvc-employees</module>
+
 	</modules>
 
 	<url/>

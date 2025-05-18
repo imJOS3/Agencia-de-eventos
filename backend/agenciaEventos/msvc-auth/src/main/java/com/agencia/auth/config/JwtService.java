@@ -1,6 +1,6 @@
 package com.agencia.auth.config;
 
-import com.agencia.auth.entity.Usuario;
+import com.agencia.auth.entity.User;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
@@ -17,10 +17,10 @@ public class JwtService {
 
     private final Key key = Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
 
-    public String generateToken(Usuario user) {
+    public String generateToken(User user) {
         return Jwts.builder()
-                .setSubject(user.getEmail())
-                .claim("name", user.getNombre())
+                .setSubject(user.getUsername())
+                .claim("name", user.getUsername())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + 86400000)) // 1 día
                 .signWith(key, SignatureAlgorithm.HS256)
@@ -36,7 +36,7 @@ public class JwtService {
                 .getSubject();
     }
 
-    public boolean isTokenValid(String token, Usuario user) {
+    public boolean isTokenValid(String token, User user) {
         final String email = extractEmail(token);
         return email.equals(user.getEmail()) && !isTokenExpired(token);
     }

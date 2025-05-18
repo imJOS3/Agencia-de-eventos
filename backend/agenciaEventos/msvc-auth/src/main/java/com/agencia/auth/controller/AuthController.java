@@ -1,22 +1,19 @@
 package com.agencia.auth.controller;
 
-
-import com.agencia.auth.dto.AuthResponse;
 import com.agencia.auth.dto.LoginRequest;
+import com.agencia.auth.dto.AuthResponse;
 import com.agencia.auth.dto.RegisterRequest;
 import com.agencia.auth.service.AuthService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/api/auth")
+@RequiredArgsConstructor
 public class AuthController {
 
     private final AuthService authService;
-
-    public AuthController(AuthService authService) {
-        this.authService = authService;
-    }
 
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> register(@RequestBody RegisterRequest request) {

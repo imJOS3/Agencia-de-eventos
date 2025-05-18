@@ -7,8 +7,8 @@ const app = express();
 
 // Configurar CORS para permitir cookies si lo necesitas (opcional)
 app.use(cors({
-  origin: 'http://localhost:5173', // o la URL de tu frontend si aplica
-  credentials: true,
+  origin: 'http://localhost:5173', 
+  credentials: true
 }));
 
 // Middleware para analizar JSON
@@ -16,7 +16,7 @@ app.use(express.json());
 
 // Configurar sesiones
 app.use(session({
-  secret: 'tu_secreto_super_seguro', // cámbialo por uno real en producción
+  secret: 'tu_secreto_super_seguro', 
   resave: false,
   saveUninitialized: false,
   cookie: {

@@ -26,7 +26,7 @@ public class JwtAuthFilter implements GlobalFilter, Ordered {
         System.out.println("[JwtAuthFilter] Ruta solicitada: " + path);
 
         // Permitir login y register sin token
-        if (path.startsWith("/auth/login") || path.startsWith("/auth/register")) {
+        if (path.startsWith("/api/auth/login") || path.startsWith("/api/auth/register")) {
             System.out.println("[JwtAuthFilter] Ruta pública, permitida sin token.");
             return chain.filter(exchange);
         }
